@@ -1,0 +1,12 @@
+success	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  success (obj, msg, url) {$/;"	function	line:4
+onClose	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^      onClose: function () {$/;"	function	line:9
+error	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  error (obj, msg, url) {$/;"	function	line:16
+onClose	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^      onClose: function () {$/;"	function	line:21
+getHttpData	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  getHttpData: function (data) {$/;"	function	line:28
+postHttpData	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  postHttpData: function (data) {$/;"	function	line:37
+axiosGetReq	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  axiosGetReq (url, msg) {$/;"	function	line:46
+axiosPostReq	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  axiosPostReq (url, msg) {$/;"	function	line:49
+filterTime	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  filterTime (value) {$/;"	function	line:52
+emptyData	/Users/apple/Desktop/project/rain/rain/src/global/global.js	/^  emptyData (data) {$/;"	function	line:60
+AMap.initAMapApiLoader.use	/Users/apple/Desktop/project/rain/rain/src/main.js	/^Vue.use(AMap);$/;"	class	line:12
+AMap.initAMapApiLoader.use.global	/Users/apple/Desktop/project/rain/rain/src/main.js	/^Vue.prototype.global = global$/;"	method	line:18
