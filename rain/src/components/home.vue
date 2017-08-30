@@ -49,18 +49,14 @@
           </el-col>
         </div>
       </el-row>
-      <!-- <button type="button" name="button" @click="changeCenter">迪娜几</button> -->
-      <!-- <div id="map" ref="map">
-        <el-amap :vid="'amap-vue'" :zoom="mapInfo.zoom" :map-manager="mapInfo.amapManager" :center="mapInfo.center" :mapStyle="mapInfo.mapStyle"></el-amap>
 
-      </div> -->
       <div class="mapContain">
         <div id="container" ref="map">
 
         </div>
         <div class="change">
-          <button type="button" name="button" @click="this.heatMap.hide()">数据图</button>
-          <button type="button" name="button" @click="this.heatMap.show()">热力图</button>
+          <button type="button" name="button" @click="toggleHotmap(1)" :class="{'active':isShowHeatmap == false}">数据图</button>
+          <button type="button" name="button" @click="toggleHotmap(0)" :class="{'active':isShowHeatmap == true}">热力图</button>
         </div>
       </div>
     </div>
@@ -74,15 +70,16 @@ import Vue_AMap from 'vue-amap'
 import areaList from '@/global/cityList'
 export default {
   data () {
-    // let amapManager = new VueAMap.AMapManager();
     return {
-      // mapInfo: null,
       mapInfo: {},
       selectInfo: {
         city: null,
         time: null,
-        historyTime: []
+        historyTime: [],
+        startTime: null,
+        endTime: null
       },
+      isShowHeatmap:false,
       cityInfo: {
         center: [118.3157440000,29.7084410000],
         zoom: 10,
@@ -91,15 +88,15 @@ export default {
       map: null,
       // center: [118.3157440000,29.7084410000],
       areaList: areaList,
-      points: [
-          {"lng":116.191031,"lat":39.988585,"count":100},
-          {"lng":116.389275,"lat":39.925818,"count":60},
-          {"lng":116.287444,"lat":39.810742,"count":200},
-          {"lng":116.481707,"lat":39.940089,"count":30},
-          {"lng":116.410588,"lat":39.880172,"count":200},
-          {"lng":116.394816,"lat":39.91181,"count":10},
-          {"lng":116.416002,"lat":39.952917,"count":150}
-      ],
+      // points: [
+      //     {"lng":116.191031,"lat":39.988585,"count":100},
+      //     {"lng":116.389275,"lat":39.925818,"count":60},
+      //     {"lng":116.287444,"lat":39.810742,"count":200},
+      //     {"lng":116.481707,"lat":39.940089,"count":30},
+      //     {"lng":116.410588,"lat":39.880172,"count":200},
+      //     {"lng":116.394816,"lat":39.91181,"count":10},
+      //     {"lng":116.416002,"lat":39.952917,"count":150}
+      // ],
       heatMap: ''
     }
   },
@@ -122,70 +119,68 @@ export default {
   },
   methods: {
     changeCity () {
-      this.init(this.cityInfo)
+      this.init(this.cityInfo,this.isShowHeatmap)
     },
-    init (obj) {
+    init (obj,isShowHeatmap) {
       var map = new AMap.Map('container', {
           center: obj.center,
           zoom: obj.zoom
-          // mapStyle: obj.zoom == 10 ? 'amap://styles/6ed2898a5817e7c65b2b5e15989d555c' : 'amap://styles/e55ccbefb27c3aeffea1800f15d88ae7'
       });
       if (obj.zoom == 10) {
-        // console.log(123)
         map.setMapStyle('amap://styles/6ed2898a5817e7c65b2b5e15989d555c')
       } else {
-        // console.log(456)
         map.setMapStyle('amap://styles/e55ccbefb27c3aeffea1800f15d88ae7')
       }
-      var heatmap;
-       map.plugin(["AMap.Heatmap"], function() {
-           //初始化heatmap对象
-           heatmap = new AMap.Heatmap(map, {
-               radius: 100, //给定半径
-               opacity: [0, 0.8],
-               gradient:{
-                0.5: 'blue',
-                0.65: 'rgb(117,211,248)',
-                0.7: 'rgb(0, 255, 0)',
-                0.9: '#ffea00',
-                1.0: 'red'
-                }
-           });
-           heatmap.setDataSet({
-               data: [
-                   {"lng":118.3157440000,"lat":29.7084410000,"count":100},
-                   {"lng":118.3153290000,"lat":29.6961090000,"count":60},
-                   {"lng":118.1415680000,"lat":30.2729420000,"count":200},
-                   {"lng":118.3367510000,"lat":29.8272790000,"count":30},
-                   {"lng":118.4153560000,"lat":29.8613080000,"count":200},
-                   {"lng":118.1991790000,"lat":29.7890950000,"count":10},
-                   {"lng":117.9383730000,"lat":29.9248050000,"count":150},
-                   {"lng":117.7173960000,"lat":29.8540550000,"count":150}
-               ],
-               max: 100
-           });
-       });
-       this.heatMap = heatmap
-      //  console.log(this.heatMap,heatmap)
-      AMap.service('AMap.DistrictSearch',function(){//回调函数
-      var districtSearch = new AMap.DistrictSearch({
-            extensions: 'all',  //返回行政区边界坐标组等具体信息
-        });
-      // districtSearch.setLevel('city');
-      // districtSearch.setSubDistrict(1);
-      districtSearch.search(obj.areaName, function(status, result){
-          var bounds = result.districtList[0].boundaries;
-          var polygon = new AMap.Polygon({  //行政区边界渲染，使用多边形覆盖物实现
-              map: map,
-              strokeWeight: 1,
-              path: bounds,
-              fillOpacity: 0.1,
-              fillColor: '#fff',
-              strokeColor: '#CC66CC'
+      if (isShowHeatmap) {
+        // console.log(123)
+        var heatmap;
+         map.plugin(["AMap.Heatmap"], function() {
+             //初始化heatmap对象
+             heatmap = new AMap.Heatmap(map, {
+                 radius: 100, //给定半径
+                 opacity: [0, 0.8],
+                 gradient:{
+                  0.5: 'blue',
+                  0.65: 'rgb(117,211,248)',
+                  0.7: 'rgb(0, 255, 0)',
+                  0.9: '#ffea00',
+                  1.0: 'red'
+                  }
+             });
+             heatmap.setDataSet({
+                 data: [
+                     {"lng":118.3157440000,"lat":29.7084410000,"count":100},
+                     {"lng":118.3153290000,"lat":29.6961090000,"count":60},
+                     {"lng":118.1415680000,"lat":30.2729420000,"count":200},
+                     {"lng":118.3367510000,"lat":29.8272790000,"count":30},
+                     {"lng":118.4153560000,"lat":29.8613080000,"count":200},
+                     {"lng":118.1991790000,"lat":29.7890950000,"count":10},
+                     {"lng":117.9383730000,"lat":29.9248050000,"count":150},
+                     {"lng":117.7173960000,"lat":29.8540550000,"count":150}
+                 ],
+                 max: 100
+             });
+         });
+         this.heatMap = heatmap
+        //  console.log(this.heatMap,heatmap)
+        AMap.service('AMap.DistrictSearch',function(){//回调函数
+        var districtSearch = new AMap.DistrictSearch({
+              extensions: 'all',  //返回行政区边界坐标组等具体信息
           });
-          map.setFitView();
-      });
-    })
+        districtSearch.search(obj.areaName, function(status, result){
+            var bounds = result.districtList[0].boundaries;
+            var polygon = new AMap.Polygon({  //行政区边界渲染，使用多边形覆盖物实现
+                map: map,
+                strokeWeight: 1,
+                path: bounds,
+                fillOpacity: 0.1,
+                fillColor: '#fff',
+                strokeColor: '#CC66CC'
+            });
+            map.setFitView();
+        });
+      })
+      }
     },
     timeFilter (date) {
       if (date) {
@@ -193,6 +188,10 @@ export default {
         const day = date.getDate() > 10 ? date.getDate() : '0' + date.getDate()
         return date.getFullYear() + '-' + month + '-' + day
       }
+    },
+    toggleHotmap (type) {
+      type == 1 ? this.isShowHeatmap = false : this.isShowHeatmap = true
+      this.changeCity()
     }
   }
 }
