@@ -40,5 +40,32 @@ export default {
       zoom: 12,
       areaName: "祁门县"
     }
+  ],
+  areaList2: [
+    {
+      center: [116.397428,39.90923],
+      areaName: "淮南市"
+    },
+    {
+      areaName: "田家庵区"
+    },
+    {
+      areaName: "潘集区"
+    },
+    {
+      areaName: "谢家集区"
+    },
+    {
+      areaName: "八公山区"
+    },
+    {
+      areaName: "大通区"
+    },
+    {
+      areaName: "寿县"
+    },
+    {
+      areaName: "凤台县"
+    }
   ]
 }
